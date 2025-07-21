@@ -1,7 +1,7 @@
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: black;
   color: white;
   overflow: hidden;
@@ -80,4 +80,22 @@ body, html {
 .visitor-counter {
   margin-top: 20px;
   font-size: 18px;
+}
+
+.music-button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid white;
+  border-radius: 10px;
+  cursor: pointer;
+  text-shadow: 0 0 8px white;
+  transition: all 0.3s ease;
+}
+
+.music-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }

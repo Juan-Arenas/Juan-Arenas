@@ -4,24 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Juan Arenas</title>
+
+  <!-- Fuente personalizada -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos -->
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
+  <!-- Pantalla de inicio con video -->
   <div class="video-bg" id="intro">
     <video autoplay muted loop id="bgVideo">
-      <source src="assets/video/Video.mp4" type="video/mp4">
+      <source src="Video.mp4" type="video/mp4">
     </video>
-    <div class="enter-button" onclick="enterSite()">Toca la pantalla para entrar</div>
+    <div class="intro-content">
+      <button class="enter-button" onclick="enterSite()">Toca para entrar</button>
+    </div>
   </div>
 
+  <!-- Contenido principal -->
   <div class="main-content" id="mainContent" style="display: none;">
     <audio id="bgMusic" loop>
-      <source src="assets/audio/music.mp3" type="audio/mpeg">
+      <source src="music.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Botón para pausar/reproducir música -->
+    <button id="musicToggle" class="music-button" onclick="toggleMusic()">🔊 Pausar Música</button>
+
     <div class="profile-card">
-      <img src="assets/img/profile.png" alt="Foto de perfil" class="profile-img">
+      <img src="https://via.placeholder.com/120" alt="Foto de perfil" class="profile-img">
       <h1>Juan Arenas</h1>
       <p>📍 La Pampara</p>
       <p>🎨 Diseñador gráfico</p>
@@ -39,6 +52,36 @@
     </div>
   </div>
 
+  <!-- Script de funcionalidad -->
+  <script>
+    const music = document.getElementById('bgMusic');
+    const toggleButton = document.getElementById('musicToggle');
+
+    function enterSite() {
+      document.getElementById('intro').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'flex';
+
+      if (music) {
+        music.play().catch(e => {
+          console.log('Autoplay bloqueado por el navegador:', e);
+        });
+      }
+    }
+
+    function toggleMusic() {
+      if (!music) return;
+
+      if (music.paused) {
+        music.play();
+        toggleButton.textContent = '🔊 Pausar Música';
+      } else {
+        music.pause();
+        toggleButton.textContent = '🔇 Reanudar Música';
+      }
+    }
+  </script>
+
+  <!-- (Opcional) Tu script externo -->
   <script src="js/main.js"></script>
 </body>
 </html>
