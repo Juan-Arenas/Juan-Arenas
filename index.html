@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio de Diseño Gráfico | Josias & Arenas</title>
+    
+    <link rel="icon" type="image/png" href="fav.png"> 
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* --- CSS con Paleta de Colores Mejorada --- */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            background-color: #1c1c1c; /* Fondo Negro Oscuro (Elegante) */
+            color: #f0f0f0; /* Texto Blanco/Gris Claro */
+        }
+
+        header {
+            background-color: #111111; /* Negro Aún Más Oscuro para el encabezado */
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        h2 {
+            text-align: center;
+            color: #f0f0f0;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #00ffff; /* Acento Cian/Azul Eléctrico */
+            padding-bottom: 10px;
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Estilo de Navegación */
+        .portfolio-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            gap: 15px;
+        }
+
+        .portfolio-nav button {
+            background-color: #333333; /* Fondo de botón oscuro */
+            color: #f0f0f0;
+            border: 1px solid #00ffff;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 255, 255, 0.1); 
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        /* Efecto al pasar el ratón y al estar activo */
+        .portfolio-nav button:hover {
+            background-color: #00ffff; /* Inversión de color al pasar el ratón */
+            color: #111111;
+            box-shadow: 0 6px 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .portfolio-nav button.active {
+            background-color: #00ffff; /* Activo con Acento Cian */
+            color: #111111;
+            border-color: #00ffff;
+            box-shadow: 0 4px 10px rgba(0, 255, 255, 0.6);
+        }
+
+        .portfolio-nav i {
+            margin-right: 8px;
+        }
+
+        /* Estilo del Contenido (Panel) */
+        .gallery-section {
+            display: none;
+            padding: 30px;
+            background-color: #2a2a2a; /* Fondo de Panel un poco más claro que el body */
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Sombra fuerte y oscura */
+            margin-bottom: 40px;
+        }
+
+        .gallery-section.active {
+            display: block;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            transition: transform 0.3s ease-in-out;
+            border: 1px solid #3d3d3d;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- NUEVO: Sección de Contacto y Redes --- */
+        #social-contact {
+            padding: 40px;
+            background-color: #111111;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .designer-contact {
+            width: 45%;
+            padding: 20px;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #2a2a2a;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            text-align: left;
+        }
+
+        .designer-contact h3 {
+            color: #00ffff;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .designer-contact p {
+            margin: 5px 0;
+            color: #cccccc;
+        }
+
+        .designer-contact a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .designer-contact a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .designer-contact {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>JOSIAS & ARENAS DESIGN</h1>
+        <p>Soluciones Visuales Estratégicas</p>
+    </header>
+
+    <div class="container">
+        
+        <h2><i class="fas fa-layer-group"></i> Nuestro Trabajo</h2>
+
+        <nav class="portfolio-nav">
+            <button onclick="showSection('logos', this)" class="active"><i class="fas fa-gem"></i> Logotipos</button>
+            <button onclick="showSection('flyers', this)"><i class="fas fa-file-alt"></i> Flyers</button>
+            <button onclick="showSection('banners', this)"><i class="fas fa-image"></i> Banners</button>
+            <button onclick="showSection('gifs', this)"><i class="fas fa-wand-magic-sparkles"></i> GIFs</button>
+            <button onclick="showSection('variaciones', this)"><i class="fas fa-shapes"></i> Variaciones</button>
+        </nav>
+
+        <section id="logos" class="gallery-section active">
+            <h3>Logotipos (Identidad de Marca)</h3>
+            <div class="gallery">
+                <img src="box.png" alt="Logo Box Design">
+                <img src="trevel.png" alt="Logo Trevel Agency">
+                <img src="code.png" alt="Logo Code Company">
+                <img src="albi.png" alt="Logo Albi Branding">
+                <img src="vacilon.png" alt="Logo Vacilon Event">
+                <img src="sin.jpg" alt="Logo Proyecto sin nombre">
+            </div>
+        </section>
+
+        <section id="flyers" class="gallery-section">
+            <h3>Flyers (Diseño Impreso y Digital)</h3>
+            <div class="gallery">
+                <img src="vehigruas.png" alt="Flyer Vehigruas">
+                <img src="aper.png" alt="Flyer Aper Event">
+                <img src="apertu.png" alt="Flyer Apertura">
+                <img src="chi.png" alt="Flyer Chi Party">
+                <img src="ri.png" alt="Flyer Ri Design">
+            </div>
+        </section>
+
+        <section id="banners" class="gallery-section">
+            <h3>Banners (Publicidad Online)</h3>
+            <div class="gallery">
+                <img src="tre.png" alt="Banner Tre">
+                <img src="ba.png" alt="Banner Ba">
+                <img src="flow.png" alt="Banner Flow">
+                <img src="bando.png" alt="Banner Bando">
+            </div>
+        </section>
+
+        <section id="gifs" class="gallery-section">
+            <h3>GIFs (Animación Web)</h3>
+            <div class="gallery">
+                <img src="hellstar.gif" alt="GIF Hellstar">
+                <img src="Legacy.gif" alt="GIF Legacy">
+                <img src="Welin.gif" alt="GIF Welin">
+                <img src="ELBARRIO.gif" alt="GIF El Barrio">
+            </div>
+        </section>
+
+        <section id="variaciones" class="gallery-section">
+            <h3>Variaciones de Diseño (Muestras de Proceso)</h3>
+            <div class="gallery">
+                <img src="va.png" alt="Variación A">
+                <img src="ve.png" alt="Variación B">
+            </div>
+        </section>
+
+        <hr style="border-top: 1px solid #3d3d3d; margin: 40px 0;">
+
+        <section id="social-contact">
+            <h2><i class="fas fa-at"></i> Redes Sociales y Contacto</h2>
+            <p>Contáctanos directamente para empezar tu próximo proyecto.</p>
+            <div class="contact-info">
+                
+                <div class="designer-contact">
+                    <h3>Arenas <i class="fas fa-code"></i></h3>
+                    <p>
+                        <i class="fab fa-discord"></i> **Discord:** 05____arenas
+                    </p>
+                    <p>
+                        <i class="fab fa-tiktok"></i> **TikTok:** <a href="https://tiktok.com/@05___arenas" target="_blank">@05___arenas</a>
+                    </p>
+                    <p>
+                        <i class="fab fa-instagram"></i> **Instagram:** <a href="https://www.instagram.com/05____arenas/" target="_blank">@05____arenas</a>
+                    </p>
+                    <p>
+                        <i class="fab fa-whatsapp"></i> **WhatsApp:** <a href="https://wa.link/duxil9" target="_blank">Enviar Mensaje</a>
+                    </p>
+                </div>
+
+                <div class="designer-contact">
+                    <h3>Josias <i class="fas fa-pencil-ruler"></i></h3>
+                    <p>
+                        <i class="fab fa-discord"></i> **Discord:** josias_rp1
+                    </p>
+                    <p>
+                        <i class="fab fa-instagram"></i> **Instagram:** <a href="https://www.instagram.com/josias_desing12/" target="_blank">@josias_desing12</a>
+                    </p>
+                    <p style="opacity: 0.7;">
+                        <i class="fab fa-tiktok"></i> TikTok: No disponible
+                    </p>
+                    <p style="opacity: 0.7;">
+                        <i class="fab fa-whatsapp"></i> WhatsApp: No disponible
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <script>
+        function showSection(sectionId, clickedButton) {
+            const sections = document.querySelectorAll('.gallery-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            const activeSection = document.getElementById(sectionId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+            }
+
+            const buttons = document.querySelectorAll('.portfolio-nav button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            clickedButton.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
