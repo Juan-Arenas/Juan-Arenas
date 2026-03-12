@@ -125,48 +125,7 @@ body {
   display: block;
 }
 
-/* JEAN — posicionada a la IZQUIERDA del stage */
-#intro-jean {
-  position: absolute;
-  /* verticalmente centrado con el muñeco */
-  top: 50%;
-  /* empieza en el centro del stage */
-  right: 50%;
-  transform: translateY(-50%) translateX(50%);
-  font-family: 'Galaksinos', 'Bebas Neue', sans-serif;
-  /* escala en función del ancho del viewport, más conservador en móvil */
-  font-size: clamp(38px, 9vw, 120px);
-  letter-spacing: 0.04em;
-  color: var(--red);
-  text-shadow:
-    0 0 30px rgba(255,30,30,0.9),
-    0 0 70px rgba(255,30,30,0.4),
-    4px 4px 0 rgba(80,0,0,1);
-  white-space: nowrap;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0;
-}
 
-/* GAMER — posicionada a la DERECHA del stage */
-#intro-gamer {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateY(-50%) translateX(-50%);
-  font-family: 'Galaksinos', 'Bebas Neue', sans-serif;
-  font-size: clamp(38px, 9vw, 120px);
-  letter-spacing: 0.04em;
-  color: var(--red);
-  text-shadow:
-    0 0 30px rgba(255,30,30,0.9),
-    0 0 70px rgba(255,30,30,0.4),
-    -4px 4px 0 rgba(80,0,0,1);
-  white-space: nowrap;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0;
-}
 
 /* ══════════════════════════════
    CANVAS BG
@@ -575,11 +534,9 @@ footer span { color:var(--red); opacity:.6; }
   <div id="intro-flash"></div>
   <div id="intro-vignette"></div>
   <div id="intro-stage">
-    <span id="intro-jean">JEAN</span>
     <div id="intro-char">
       <img src="JeanG.png" alt="Jean Gamer">
     </div>
-    <span id="intro-gamer">GAMER</span>
   </div>
 </div>
 
@@ -736,74 +693,45 @@ footer span { color:var(--red); opacity:.6; }
 
 <script>
 /* ═══════════════════ INTRO SEQUENCER ═══════════════════ */
-const intro      = document.getElementById('intro');
-const introJean  = document.getElementById('intro-jean');
-const introGamer = document.getElementById('intro-gamer');
-const introChar  = document.getElementById('intro-char');
-const mainPage   = document.getElementById('main-page');
+const intro     = document.getElementById('intro');
+const introChar = document.getElementById('intro-char');
+const mainPage  = document.getElementById('main-page');
 
 function tr(el, val) {
-  el.style.transition        = val;
-  el.style.webkitTransition  = val;
+  el.style.transition       = val;
+  el.style.webkitTransition = val;
 }
 
 // ── FASE 1: muñeco zoom-out ──────────────────────────────────
 requestAnimationFrame(() => {
   requestAnimationFrame(() => {
     tr(introChar,
-      'transform 1.05s cubic-bezier(0.16,1,0.3,1) 0.12s, opacity 0.35s ease 0.2s');
+      'transform 1.1s cubic-bezier(0.16,1,0.3,1) 0.12s, opacity 0.35s ease 0.2s');
     introChar.style.transform = 'scale(1) translateY(0)';
     introChar.style.opacity   = '1';
   });
 });
 
-// ── FASE 2: letras emergen de detrás y se separan ────────────
+// ── FASE 2: muñeco se encoge y desaparece (1.9s) ─────────────
 setTimeout(() => {
-  const jW  = introJean.offsetWidth;
-  const gW  = introGamer.offsetWidth;
-  const cW  = introChar.offsetWidth;
-  const gap = Math.round(cW * 0.06);
+  tr(introChar,
+    'transform 0.45s cubic-bezier(0.55,0,1,0.45) 0.04s, opacity 0.35s ease 0.04s');
+  introChar.style.opacity   = '0';
+  introChar.style.transform = 'scale(0.45) translateY(-14%)';
+}, 1900);
 
-  const jeanPx  = -(jW / 2 + cW / 2 + gap);
-  const gamerPx =  (gW / 2 + cW / 2 + gap);
-
-  tr(introJean,  'transform 0.72s cubic-bezier(0.16,1,0.3,1), opacity 0.2s ease');
-  tr(introGamer, 'transform 0.72s cubic-bezier(0.16,1,0.3,1), opacity 0.2s ease');
-
-  introJean.style.opacity    = '1';
-  introGamer.style.opacity   = '1';
-  introJean.style.transform  = 'translateY(-50%) translateX(calc(-50% + ' + jeanPx + 'px))';
-  introGamer.style.transform = 'translateY(-50%) translateX(calc(-50% + ' + gamerPx + 'px))';
-}, 900);
-
-// ── FASE 3: todo sale disparado ──────────────────────────────
-setTimeout(() => {
-  const blast = Math.round(window.innerWidth * 0.75);
-
-  tr(introJean,  'transform 0.42s cubic-bezier(0.55,0,1,0.45), opacity 0.3s ease');
-  tr(introGamer, 'transform 0.42s cubic-bezier(0.55,0,1,0.45), opacity 0.3s ease');
-  tr(introChar,  'transform 0.38s cubic-bezier(0.55,0,1,0.45) 0.04s, opacity 0.28s ease 0.04s');
-
-  introJean.style.opacity    = '0';
-  introGamer.style.opacity   = '0';
-  introChar.style.opacity    = '0';
-  introJean.style.transform  = 'translateY(-50%) translateX(calc(-50% - ' + blast + 'px))';
-  introGamer.style.transform = 'translateY(-50%) translateX(calc(-50% + ' + blast + 'px))';
-  introChar.style.transform  = 'scale(0.45) translateY(-14%)';
-}, 2050);
-
-// ── FASE 4: fade out intro ───────────────────────────────────
+// ── FASE 3: fade out intro (2.45s) ───────────────────────────
 setTimeout(() => {
   tr(intro, 'opacity 0.5s ease');
   intro.style.opacity       = '0';
   intro.style.pointerEvents = 'none';
-}, 2600);
+}, 2450);
 
-// ── FASE 5: revelar página ───────────────────────────────────
+// ── FASE 4: revelar página (2.85s) ───────────────────────────
 setTimeout(() => {
   intro.style.display = 'none';
   mainPage.classList.add('visible');
-}, 3150);
+}, 2850);
 
 /* ═══════════════════ CANVAS PARTICLES ═══════════════════ */
 const canvas = document.getElementById('bg-canvas');
