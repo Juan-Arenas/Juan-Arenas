@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jean Gamer | Motion Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* Galaksinos font — archivo local */
+@font-face {
+  font-family: 'Galaksinos';
+  src: url('Galaksinos Slant.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+:root {
+  --red: #ff1e1e;
+  --red-dark: #8b0000;
+  --red-glow: rgba(255,30,30,0.5);
+  --cyan: #00f2ea;
+  --pink: #ff0050;
+  --green: #25d366;
+  --purple: #cf96fd;
+  --bg: #050505;
+  --bg-card: rgba(15,5,5,0.88);
+  --text: #ffffff;
+  --text-muted: rgba(255,255,255,0.5);
+  --border: rgba(255,30,30,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════
+   INTRO SCREEN
+══════════════════════════════ */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#intro.hide {
+  animation: introOut 0.55s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes introOut {
+  0%   { opacity:1; }
+  100% { opacity:0; visibility:hidden; }
+}
+
+/* flash */
+#intro-flash {
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  opacity: 0;
+  animation: flash 0.3s 0.08s ease forwards;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes flash {
+  0%   { opacity:0; }
+  35%  { opacity:0.22; }
+  100% { opacity:0; }
+}
+
+/* scanlines */
+#intro::before {
+  content:'';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.09) 2px, rgba(0,0,0,0.09) 4px
+  );
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* vignette */
+#intro-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(100,0,0,0.45) 100%);
+  z-index: 3;
+  pointer-events: none;
+  animation: vigIn 0.9s 0.1s ease both;
+}
+@keyframes vigIn { from{opacity:0} to{opacity:1} }
+
+/* CHARACTER — encima de las letras siempre */
+#intro-char {
+  position: relative;
+  z-index: 6;
+  filter: drop-shadow(0 0 70px rgba(255,30,30,0.65))
+          drop-shadow(0 0 20px rgba(255,30,30,0.4));
+  transform: scale(5.5) translateY(8%);
+  opacity: 0;
+  transition: none;
+}
+#intro-char img {
+  width: 300px;
+  max-width: 62vw;
+  display: block;
+}
+
+/* JEAN & GAMER — empiezan en el centro, ocultas detrás del muñeco */
+#intro-jean,
+#intro-gamer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-family: 'Galaksinos', 'Bebas Neue', sans-serif;
+  font-size: clamp(75px, 14vw, 135px);
+  letter-spacing: 6px;
+  color: var(--red);
+  text-shadow:
+    0 0 40px rgba(255,30,30,0.9),
+    0 0 100px rgba(255,30,30,0.4),
+    5px 5px 0 rgba(80,0,0,1);
+  white-space: nowrap;
+  z-index: 4;          /* debajo del muñeco (z-index 6) */
+  pointer-events: none;
+  opacity: 0;
+  /* posición inicial: centradas exactamente sobre el muñeco */
+  transform: translateY(-50%) translateX(-50%);
+}
+
+/* ══════════════════════════════
+   CANVAS BG
+══════════════════════════════ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::after {
+  content:'';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+/* ══════════════════════════════
+   PAGE — hidden until intro ends
+══════════════════════════════ */
+.page {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px 70px;
+  max-width: 540px;
+  margin: 0 auto;
+  opacity: 0;
+}
+
+.page.visible {
+  animation: pageIn 0.7s ease forwards;
+}
+
+@keyframes pageIn {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* TOP BAR */
+.top-bar {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--pink), var(--red), transparent);
+  animation: barPulse 3s ease-in-out infinite;
+}
+@keyframes barPulse {
+  0%,100% { opacity:.7; }
+  50%     { opacity:1; filter:brightness(1.5); }
+}
+
+/* ══════════════════════════════
+   HERO
+══════════════════════════════ */
+.hero {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 36px;
+  text-align: center;
+}
+
+/* CIRCULAR AVATAR */
+.avatar-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 22px;
+  animation: charFloat 4.5s ease-in-out infinite;
+}
+
+@keyframes charFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-8px); }
+}
+
+.avatar-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--red), var(--pink), #5c0000, var(--red), var(--pink), #5c0000, var(--red));
+  animation: spinRing 4s linear infinite;
+  filter: blur(1px);
+}
+@keyframes spinRing { to { transform: rotate(360deg); } }
+
+.avatar-inner {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--bg);
+  z-index: 1;
+}
+
+.avatar-img {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a0000, #2d0505);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-fallback {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--red), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.avatar-glow {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 35px;
+  background: radial-gradient(ellipse, rgba(255,30,30,0.45) 0%, transparent 70%);
+  filter: blur(10px);
+  z-index: 0;
+  animation: glowPulse 4.5s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { opacity:.7; transform: translateX(-50%) scaleX(1); }
+  50%     { opacity:1;  transform: translateX(-50%) scaleX(1.3); }
+}
+
+/* NAME */
+.name-block { margin-top: 8px; }
+
+.name-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--red);
+  opacity: .8;
+  margin-bottom: 4px;
+}
+
+.name-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 76px;
+  letter-spacing: 8px;
+  line-height: .92;
+}
+
+.name-first {
+  display: block;
+  color: white;
+  filter: drop-shadow(0 0 18px rgba(255,255,255,.14));
+}
+
+.name-last {
+  display: block;
+  background: linear-gradient(135deg, var(--red) 0%, var(--pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 25px var(--red-glow));
+}
+
+.name-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.bio {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 300px;
+}
+.bio b { color: var(--purple); font-weight: 500; }
+
+/* STATS */
+.stats {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 50px;
+  background: rgba(255,30,30,0.07);
+  border: 1px solid rgba(255,30,30,0.2);
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+  transition: all .25s;
+}
+.stat-pill:hover {
+  background: rgba(255,30,30,0.14);
+  border-color: rgba(255,30,30,0.4);
+  color: white;
+}
+.stat-pill svg { width:13px; height:13px; flex-shrink:0; }
+
+/* DIVIDER */
+.divider {
+  width: 100%;
+  margin: 30px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.divider-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,30,30,0.25), transparent);
+}
+.divider-diamond {
+  width:6px; height:6px;
+  background: var(--red);
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px var(--red);
+}
+
+/* ══════════════════════════════
+   SERVICES
+══════════════════════════════ */
+.services {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.service-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  backdrop-filter: blur(12px);
+  transition: all .25s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.service-card::before {
+  content:'';
+  position: absolute;
+  top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--pink), transparent);
+  opacity:0; transition: opacity .25s;
+}
+.service-card:hover {
+  border-color: rgba(255,30,30,.4);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255,0,0,.12);
+}
+.service-card:hover::before { opacity:1; }
+
+.service-icon {
+  width:38px; height:38px;
+  border-radius:10px;
+  background: rgba(255,30,30,0.08);
+  border: 1px solid rgba(255,30,30,0.18);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:12px; transition: all .25s;
+}
+.service-card:hover .service-icon {
+  background: rgba(255,30,30,0.15);
+  box-shadow: 0 0 14px rgba(255,30,30,.2);
+}
+.service-icon svg { width:18px; height:18px; }
+
+.service-name {
+  font-family: 'Oswald', sans-serif;
+  font-size:14px; font-weight:600;
+  letter-spacing:1.5px; text-transform:uppercase;
+  color:white; margin-bottom:5px;
+}
+.service-desc {
+  font-size:12px; font-weight:300;
+  color:var(--text-muted); line-height:1.5;
+}
+
+/* ══════════════════════════════
+   LINKS
+══════════════════════════════ */
+.links {
+  width:100%;
+  display:flex; flex-direction:column; gap:12px;
+}
+
+.link-btn {
+  display:flex; align-items:center; gap:15px;
+  width:100%; padding:15px 18px;
+  border-radius:14px;
+  text-decoration:none; color:white;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  backdrop-filter:blur(12px);
+  transition:all .25s ease;
+  position:relative; overflow:hidden;
+}
+.link-btn::after {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,30,30,.07) 0%,transparent 60%);
+  opacity:0; transition:opacity .25s;
+}
+.link-btn:hover {
+  transform:translateY(-3px) scale(1.01);
+  border-color:rgba(255,30,30,.5);
+  box-shadow:0 8px 28px rgba(255,0,0,.18);
+}
+.link-btn:hover::after { opacity:1; }
+.link-btn:active { transform:scale(.98); }
+
+.btn-icon {
+  width:44px; height:44px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; position:relative; z-index:1; transition:transform .25s;
+}
+.link-btn:hover .btn-icon { transform:scale(1.08); }
+.btn-icon svg { width:22px; height:22px; fill:white; }
+
+.btn-icon.tiktok {
+  background:linear-gradient(135deg,#010101,#1c1c1c);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 4px 14px rgba(0,0,0,.5);
+}
+.btn-icon.wpp {
+  background:linear-gradient(135deg,#128c7e,#25d366);
+  box-shadow:0 4px 14px rgba(37,211,102,.3);
+}
+
+.btn-text { flex:1; position:relative; z-index:1; }
+
+.btn-label {
+  font-family:'Oswald',sans-serif;
+  font-size:17px; font-weight:600;
+  letter-spacing:2px; text-transform:uppercase; line-height:1;
+}
+.btn-sublabel {
+  font-size:12px; font-weight:300;
+  color:var(--text-muted); margin-top:3px;
+}
+
+.btn-arrow {
+  color:rgba(255,255,255,.25);
+  transition:transform .25s,color .25s;
+  position:relative; z-index:1;
+}
+.link-btn:hover .btn-arrow { transform:translateX(5px); color:var(--red); }
+
+/* TikTok glitch */
+.tiktok-label { position:relative; display:inline-block; }
+.tiktok-label .lc { position:absolute; top:0; left:-2px; color:var(--cyan); opacity:.65; filter:blur(.4px); }
+.tiktok-label .lp { position:absolute; top:0; left:2px;  color:var(--pink); opacity:.65; filter:blur(.4px); }
+.tiktok-label .lm { position:relative; color:white; }
+
+/* FOOTER */
+footer {
+  margin-top:52px; text-align:center;
+  font-family:'Oswald',sans-serif;
+  font-size:11px; letter-spacing:3px;
+  text-transform:uppercase; color:rgba(255,255,255,.2);
+}
+footer span { color:var(--red); opacity:.6; }
+</style>
+</head>
+
+<body>
+
+<!-- ══ INTRO SCREEN ══ -->
+<div id="intro">
+  <div id="intro-flash"></div>
+  <div id="intro-vignette"></div>
+  <span id="intro-jean">JEAN</span>
+  <div id="intro-char">
+    <img src="JeanG.png" alt="Jean Gamer">
+  </div>
+  <span id="intro-gamer">GAMER</span>
+</div>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="page" id="main-page">
+
+  <div class="top-bar"></div>
+
+  <!-- HERO -->
+  <div class="hero">
+
+    <!-- AVATAR CIRCULAR -->
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar-inner"></div>
+      <div class="avatar-img">
+        <img src="Jean.png" alt="Jean Gamer"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'avatar-fallback\'>JG</div>'">
+      </div>
+      <div class="avatar-glow"></div>
+    </div>
+
+    <div class="name-block">
+      <div class="name-label">Motion Designer</div>
+      <div class="name-main">
+        <span class="name-first">Jean</span>
+        <span class="name-last">Gamer</span>
+      </div>
+      <div class="name-tag">Editor Audiovisual · After Effects</div>
+    </div>
+
+    <p class="bio">
+      Elevando el contenido de TikTok al siguiente nivel con <b>VFX</b>, animaciones y edición de alto impacto.
+    </p>
+
+    <div class="stats">
+      <div class="stat-pill">
+        <svg viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        After Effects
+      </div>
+      <div class="stat-pill">
+        <svg viewBox="0 0 24 24" fill="var(--red)"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg>
+        Motion VFX
+      </div>
+      <div class="stat-pill">
+        <svg viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        TikTok Creator
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="services">
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M17.8 6.2 19 5M12.2 6.2 11 5M12.2 11.8 11 13"/>
+          <path d="M3 21 12 12"/><path d="m3 14 .5-.5 4 4L7 18"/>
+          <rect x="2" y="18" width="4" height="4" rx="1" transform="rotate(-45 4 20)"/>
+        </svg>
+      </div>
+      <div class="service-name">VFX & Animación</div>
+      <div class="service-desc">Efectos visuales avanzados y transiciones cinematográficas.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="var(--red)"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg>
+      </div>
+      <div class="service-name">High Energy</div>
+      <div class="service-desc">Edición rápida y rítmica diseñada para retención máxima.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 2H8M12 2v5M7 2v5M17 2v5"/>
+          <circle cx="9" cy="14" r="1.5"/><circle cx="15" cy="14" r="1.5"/>
+        </svg>
+      </div>
+      <div class="service-name">Contenido TikTok</div>
+      <div class="service-desc">Edición optimizada para el algoritmo y tendencias actuales.</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/>
+          <circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.47-1.125-.29-.289-.47-.688-.47-1.125a1.64 1.64 0 0 1 1.648-1.688h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+        </svg>
+      </div>
+      <div class="service-name">Motion Graphics</div>
+      <div class="service-desc">Gráficos en movimiento personalizados para tu marca.</div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider" style="margin-top:28px">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- LINKS -->
+  <div class="links">
+
+    <a class="link-btn" href="https://www.tiktok.com/@jean_gamer18" target="_blank">
+      <div class="btn-icon tiktok">
+        <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+      </div>
+      <div class="btn-text">
+        <div class="btn-label">
+          <span class="tiktok-label">
+            <span class="lc">TikTok</span>
+            <span class="lp">TikTok</span>
+            <span class="lm">TikTok</span>
+          </span>
+        </div>
+        <div class="btn-sublabel">Sígueme · @jean_gamer18</div>
+      </div>
+      <div class="btn-arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+    <a class="link-btn" href="https://wa.me/573124386385" target="_blank">
+      <div class="btn-icon wpp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+      </div>
+      <div class="btn-text">
+        <div class="btn-label">WhatsApp</div>
+        <div class="btn-sublabel">Contrataciones y consultas</div>
+      </div>
+      <div class="btn-arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+  </div>
+
+  <footer>© 2026 <span>Jean Gamer</span> · Motion Designer</footer>
+
+</div>
+
+<script>
+/* ═══════════════════ INTRO SEQUENCER ═══════════════════ */
+const intro      = document.getElementById('intro');
+const introJean  = document.getElementById('intro-jean');
+const introGamer = document.getElementById('intro-gamer');
+const introChar  = document.getElementById('intro-char');
+const mainPage   = document.getElementById('main-page');
+
+const easeOut  = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const easeIn   = 'cubic-bezier(0.55, 0, 1, 0.45)';
+
+// ── FASE 1: muñeco hace zoom-out (0 → 1.05s) ──────────────────
+introChar.animate([
+  { transform: 'scale(5.5) translateY(8%)', opacity: 0 },
+  { transform: 'scale(5.5) translateY(8%)', opacity: 0, offset: 0.0 },
+  { opacity: 1,                             offset: 0.25 },
+  { transform: 'scale(1) translateY(0)',    opacity: 1 }
+], { duration: 1050, delay: 120, easing: easeOut, fill: 'forwards' });
+
+// ── FASE 2: letras salen de detrás hacia los lados (900ms → 1.7s) ──
+// Empiezan exactamente en el centro (detrás del muñeco, z-index menor)
+// y se deslizan hasta quedar a los costados
+setTimeout(() => {
+  introJean.animate([
+    { transform: 'translateY(-50%) translateX(-50%)',  opacity: 0   },
+    { transform: 'translateY(-50%) translateX(-50%)',  opacity: 0.8, offset: 0.12 },
+    { transform: 'translateY(-50%) translateX(-148%)', opacity: 1   }
+  ], { duration: 750, easing: easeOut, fill: 'forwards' });
+
+  introGamer.animate([
+    { transform: 'translateY(-50%) translateX(-50%)', opacity: 0   },
+    { transform: 'translateY(-50%) translateX(-50%)', opacity: 0.8, offset: 0.12 },
+    { transform: 'translateY(-50%) translateX(48%)',  opacity: 1   }
+  ], { duration: 750, easing: easeOut, fill: 'forwards' });
+}, 900);
+
+// ── FASE 3: todo explota hacia afuera (2.0s) ──────────────────
+setTimeout(() => {
+  // letras vuelan hacia los extremos
+  introJean.animate([
+    { transform: 'translateY(-50%) translateX(-148%)', opacity: 1 },
+    { transform: 'translateY(-50%) translateX(-280%)', opacity: 0 }
+  ], { duration: 420, easing: easeIn, fill: 'forwards' });
+
+  introGamer.animate([
+    { transform: 'translateY(-50%) translateX(48%)',  opacity: 1 },
+    { transform: 'translateY(-50%) translateX(185%)', opacity: 0 }
+  ], { duration: 420, easing: easeIn, fill: 'forwards' });
+
+  // muñeco se encoge y desaparece
+  introChar.animate([
+    { transform: 'scale(1) translateY(0)',      opacity: 1, filter: 'blur(0px)'  },
+    { transform: 'scale(0.5) translateY(-12%)', opacity: 0, filter: 'blur(8px)'  }
+  ], { duration: 380, delay: 40, easing: easeIn, fill: 'forwards' });
+}, 2000);
+
+// ── FASE 4: fade out pantalla intro (2.55s) ───────────────────
+setTimeout(() => {
+  intro.animate(
+    [{ opacity: 1 }, { opacity: 0 }],
+    { duration: 500, easing: 'ease', fill: 'forwards' }
+  );
+  intro.style.pointerEvents = 'none';
+}, 2550);
+
+// ── FASE 5: revelar página principal (2.9s) ───────────────────
+setTimeout(() => {
+  mainPage.classList.add('visible');
+}, 2900);
+
+/* ═══════════════════ CANVAS PARTICLES ═══════════════════ */
+const canvas = document.getElementById('bg-canvas');
+const ctx    = canvas.getContext('2d');
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function drawBg() {
+  const g = ctx.createRadialGradient(
+    canvas.width/2, canvas.height*0.28, 0,
+    canvas.width/2, canvas.height*0.28, canvas.width*0.78
+  );
+  g.addColorStop(0,   'rgba(90,0,0,0.2)');
+  g.addColorStop(0.5, 'rgba(28,0,0,0.07)');
+  g.addColorStop(1,   'rgba(5,5,5,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+const particles = Array.from({length: 65}, () => ({
+  x:   Math.random() * window.innerWidth,
+  y:   Math.random() * window.innerHeight,
+  r:   Math.random() * 1.6 + 0.3,
+  vx:  (Math.random() - 0.5) * 0.3,
+  vy:  (Math.random() - 0.5) * 0.3,
+  a:   Math.random() * 0.45 + 0.08,
+  col: Math.random() > 0.55
+    ? 'rgba(255,30,30,'
+    : Math.random() > 0.5
+      ? 'rgba(255,0,80,'
+      : 'rgba(255,255,255,'
+}));
+
+let scanY = 0;
+
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBg();
+
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.col + p.a + ')';
+    ctx.fill();
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+  });
+
+  ctx.fillStyle = 'rgba(255,20,20,0.012)';
+  ctx.fillRect(0, scanY % canvas.height, canvas.width, 2);
+  scanY += 1.8;
+
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>
