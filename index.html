@@ -53,16 +53,10 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-}
-
-#intro.hide {
-  animation: introOut 0.55s ease forwards;
-  pointer-events: none;
-}
-
-@keyframes introOut {
-  0%   { opacity:1; }
-  100% { opacity:0; visibility:hidden; }
+  /* Fuerza que ocupe toda la pantalla en móvil */
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
 }
 
 /* flash */
@@ -105,42 +99,73 @@ body {
 }
 @keyframes vigIn { from{opacity:0} to{opacity:1} }
 
-/* CHARACTER — encima de las letras siempre */
+/* Contenedor central — todo se posiciona relativo a él */
+#intro-stage {
+  position: relative;
+  width: min(300px, 62vw);
+  /* altura suficiente para el muñeco */
+  aspect-ratio: 0.52 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CHARACTER — siempre encima (z-index mayor) */
 #intro-char {
   position: relative;
   z-index: 6;
-  filter: drop-shadow(0 0 70px rgba(255,30,30,0.65))
+  width: 100%;
+  filter: drop-shadow(0 0 60px rgba(255,30,30,0.65))
           drop-shadow(0 0 20px rgba(255,30,30,0.4));
-  transform: scale(5.5) translateY(8%);
   opacity: 0;
-  transition: none;
+  transform: scale(5.5) translateY(8%);
 }
 #intro-char img {
-  width: 300px;
-  max-width: 62vw;
+  width: 100%;
   display: block;
 }
 
-/* JEAN & GAMER — empiezan en el centro, ocultas detrás del muñeco */
-#intro-jean,
+/* JEAN — posicionada a la IZQUIERDA del stage */
+#intro-jean {
+  position: absolute;
+  /* verticalmente centrado con el muñeco */
+  top: 50%;
+  /* empieza en el centro del stage */
+  right: 50%;
+  transform: translateY(-50%) translateX(50%);
+  font-family: 'Galaksinos', 'Bebas Neue', sans-serif;
+  /* escala en función del ancho del viewport, más conservador en móvil */
+  font-size: clamp(38px, 9vw, 120px);
+  letter-spacing: 0.04em;
+  color: var(--red);
+  text-shadow:
+    0 0 30px rgba(255,30,30,0.9),
+    0 0 70px rgba(255,30,30,0.4),
+    4px 4px 0 rgba(80,0,0,1);
+  white-space: nowrap;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* GAMER — posicionada a la DERECHA del stage */
 #intro-gamer {
   position: absolute;
   top: 50%;
   left: 50%;
+  transform: translateY(-50%) translateX(-50%);
   font-family: 'Galaksinos', 'Bebas Neue', sans-serif;
-  font-size: clamp(75px, 14vw, 135px);
-  letter-spacing: 6px;
+  font-size: clamp(38px, 9vw, 120px);
+  letter-spacing: 0.04em;
   color: var(--red);
   text-shadow:
-    0 0 40px rgba(255,30,30,0.9),
-    0 0 100px rgba(255,30,30,0.4),
-    5px 5px 0 rgba(80,0,0,1);
+    0 0 30px rgba(255,30,30,0.9),
+    0 0 70px rgba(255,30,30,0.4),
+    -4px 4px 0 rgba(80,0,0,1);
   white-space: nowrap;
-  z-index: 4;          /* debajo del muñeco (z-index 6) */
+  z-index: 4;
   pointer-events: none;
   opacity: 0;
-  /* posición inicial: centradas exactamente sobre el muñeco */
-  transform: translateY(-50%) translateX(-50%);
 }
 
 /* ══════════════════════════════
@@ -549,11 +574,13 @@ footer span { color:var(--red); opacity:.6; }
 <div id="intro">
   <div id="intro-flash"></div>
   <div id="intro-vignette"></div>
-  <span id="intro-jean">JEAN</span>
-  <div id="intro-char">
-    <img src="JeanG.png" alt="Jean Gamer">
+  <div id="intro-stage">
+    <span id="intro-jean">JEAN</span>
+    <div id="intro-char">
+      <img src="JeanG.png" alt="Jean Gamer">
+    </div>
+    <span id="intro-gamer">GAMER</span>
   </div>
-  <span id="intro-gamer">GAMER</span>
 </div>
 
 <canvas id="bg-canvas"></canvas>
@@ -715,67 +742,68 @@ const introGamer = document.getElementById('intro-gamer');
 const introChar  = document.getElementById('intro-char');
 const mainPage   = document.getElementById('main-page');
 
-const easeOut  = 'cubic-bezier(0.16, 1, 0.3, 1)';
-const easeIn   = 'cubic-bezier(0.55, 0, 1, 0.45)';
+function tr(el, val) {
+  el.style.transition        = val;
+  el.style.webkitTransition  = val;
+}
 
-// ── FASE 1: muñeco hace zoom-out (0 → 1.05s) ──────────────────
-introChar.animate([
-  { transform: 'scale(5.5) translateY(8%)', opacity: 0 },
-  { transform: 'scale(5.5) translateY(8%)', opacity: 0, offset: 0.0 },
-  { opacity: 1,                             offset: 0.25 },
-  { transform: 'scale(1) translateY(0)',    opacity: 1 }
-], { duration: 1050, delay: 120, easing: easeOut, fill: 'forwards' });
+// ── FASE 1: muñeco zoom-out ──────────────────────────────────
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    tr(introChar,
+      'transform 1.05s cubic-bezier(0.16,1,0.3,1) 0.12s, opacity 0.35s ease 0.2s');
+    introChar.style.transform = 'scale(1) translateY(0)';
+    introChar.style.opacity   = '1';
+  });
+});
 
-// ── FASE 2: letras salen de detrás hacia los lados (900ms → 1.7s) ──
-// Empiezan exactamente en el centro (detrás del muñeco, z-index menor)
-// y se deslizan hasta quedar a los costados
+// ── FASE 2: letras emergen de detrás y se separan ────────────
 setTimeout(() => {
-  introJean.animate([
-    { transform: 'translateY(-50%) translateX(-50%)',  opacity: 0   },
-    { transform: 'translateY(-50%) translateX(-50%)',  opacity: 0.8, offset: 0.12 },
-    { transform: 'translateY(-50%) translateX(-148%)', opacity: 1   }
-  ], { duration: 750, easing: easeOut, fill: 'forwards' });
+  const jW  = introJean.offsetWidth;
+  const gW  = introGamer.offsetWidth;
+  const cW  = introChar.offsetWidth;
+  const gap = Math.round(cW * 0.06);
 
-  introGamer.animate([
-    { transform: 'translateY(-50%) translateX(-50%)', opacity: 0   },
-    { transform: 'translateY(-50%) translateX(-50%)', opacity: 0.8, offset: 0.12 },
-    { transform: 'translateY(-50%) translateX(48%)',  opacity: 1   }
-  ], { duration: 750, easing: easeOut, fill: 'forwards' });
+  const jeanPx  = -(jW / 2 + cW / 2 + gap);
+  const gamerPx =  (gW / 2 + cW / 2 + gap);
+
+  tr(introJean,  'transform 0.72s cubic-bezier(0.16,1,0.3,1), opacity 0.2s ease');
+  tr(introGamer, 'transform 0.72s cubic-bezier(0.16,1,0.3,1), opacity 0.2s ease');
+
+  introJean.style.opacity    = '1';
+  introGamer.style.opacity   = '1';
+  introJean.style.transform  = 'translateY(-50%) translateX(calc(-50% + ' + jeanPx + 'px))';
+  introGamer.style.transform = 'translateY(-50%) translateX(calc(-50% + ' + gamerPx + 'px))';
 }, 900);
 
-// ── FASE 3: todo explota hacia afuera (2.0s) ──────────────────
+// ── FASE 3: todo sale disparado ──────────────────────────────
 setTimeout(() => {
-  // letras vuelan hacia los extremos
-  introJean.animate([
-    { transform: 'translateY(-50%) translateX(-148%)', opacity: 1 },
-    { transform: 'translateY(-50%) translateX(-280%)', opacity: 0 }
-  ], { duration: 420, easing: easeIn, fill: 'forwards' });
+  const blast = Math.round(window.innerWidth * 0.75);
 
-  introGamer.animate([
-    { transform: 'translateY(-50%) translateX(48%)',  opacity: 1 },
-    { transform: 'translateY(-50%) translateX(185%)', opacity: 0 }
-  ], { duration: 420, easing: easeIn, fill: 'forwards' });
+  tr(introJean,  'transform 0.42s cubic-bezier(0.55,0,1,0.45), opacity 0.3s ease');
+  tr(introGamer, 'transform 0.42s cubic-bezier(0.55,0,1,0.45), opacity 0.3s ease');
+  tr(introChar,  'transform 0.38s cubic-bezier(0.55,0,1,0.45) 0.04s, opacity 0.28s ease 0.04s');
 
-  // muñeco se encoge y desaparece
-  introChar.animate([
-    { transform: 'scale(1) translateY(0)',      opacity: 1, filter: 'blur(0px)'  },
-    { transform: 'scale(0.5) translateY(-12%)', opacity: 0, filter: 'blur(8px)'  }
-  ], { duration: 380, delay: 40, easing: easeIn, fill: 'forwards' });
-}, 2000);
+  introJean.style.opacity    = '0';
+  introGamer.style.opacity   = '0';
+  introChar.style.opacity    = '0';
+  introJean.style.transform  = 'translateY(-50%) translateX(calc(-50% - ' + blast + 'px))';
+  introGamer.style.transform = 'translateY(-50%) translateX(calc(-50% + ' + blast + 'px))';
+  introChar.style.transform  = 'scale(0.45) translateY(-14%)';
+}, 2050);
 
-// ── FASE 4: fade out pantalla intro (2.55s) ───────────────────
+// ── FASE 4: fade out intro ───────────────────────────────────
 setTimeout(() => {
-  intro.animate(
-    [{ opacity: 1 }, { opacity: 0 }],
-    { duration: 500, easing: 'ease', fill: 'forwards' }
-  );
+  tr(intro, 'opacity 0.5s ease');
+  intro.style.opacity       = '0';
   intro.style.pointerEvents = 'none';
-}, 2550);
+}, 2600);
 
-// ── FASE 5: revelar página principal (2.9s) ───────────────────
+// ── FASE 5: revelar página ───────────────────────────────────
 setTimeout(() => {
+  intro.style.display = 'none';
   mainPage.classList.add('visible');
-}, 2900);
+}, 3150);
 
 /* ═══════════════════ CANVAS PARTICLES ═══════════════════ */
 const canvas = document.getElementById('bg-canvas');
